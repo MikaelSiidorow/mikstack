@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: "{{projectName}}"
+    command: ["postgres", "-c", "wal_level=logical"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  zero-cache:
+    image: rocicorp/zero:${ZERO_VERSION}
+    restart: always
+    ports:
+      - 4848:4848
+    environment:
+      ZERO_UPSTREAM_DB: postgres://root:${POSTGRES_PASSWORD}@db:5432/{{projectName}}
+      ZERO_CVR_DB: postgres://root:${POSTGRES_PASSWORD}@db:5432/{{projectName}}_cvr
+      ZERO_CHANGE_DB: postgres://root:${POSTGRES_PASSWORD}@db:5432/{{projectName}}_cdb
+      ZERO_REPLICA_FILE: /data/sync-replica.db
+      ZERO_PUSH_URL: http://app:3000/api/zero/mutate
+      ZERO_QUERY_URL: http://app:3000/api/zero/get-queries
+      ZERO_QUERY_FORWARD_COOKIES: "true"
+      ZERO_MUTATE_FORWARD_COOKIES: "true"
+      ZERO_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+    volumes:
+      - zero-data:/data
+    depends_on:
+      - db
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgres://root:${POSTGRES_PASSWORD}@db:5432/{{projectName}}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      ORIGIN: ${BETTER_AUTH_URL}
+      PUBLIC_SERVER: ${PUBLIC_SERVER}
+    depends_on:
+      - db
+      - zero-cache
+
+volumes:
+  pgdata:
+  zero-data:

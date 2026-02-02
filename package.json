@@ -1,0 +1,30 @@
+{
+  "name": "mikstack",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikaelSiidorow/mikstack.git"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "check": "bun run --filter '*' check",
+    "lint": "bun run --filter '*' lint",
+    "test": "bun run --filter '*' test",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "@svitejs/changesets-changelog-github-compact": "^1.2.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1"
+  }
+}

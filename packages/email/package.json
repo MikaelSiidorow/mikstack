@@ -1,0 +1,43 @@
+{
+  "name": "@mikstack/email",
+  "version": "0.2.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikaelSiidorow/mikstack.git",
+    "directory": "packages/email"
+  },
+  "files": [
+    "src",
+    "types"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "dts-buddy types/index.d.ts",
+    "lint": "concurrently 'oxlint --type-aware --type-check' 'oxfmt --check src' 'publint' 'attw --pack . --ignore-rules cjs-resolves-to-esm no-resolution'",
+    "format": "oxfmt src",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@types/bun": "latest",
+    "concurrently": "^9.2.1",
+    "dts-buddy": "^0.6.2",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
+    "oxlint-tsgolint": "^0.11.4",
+    "publint": "^0.3.17"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

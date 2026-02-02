@@ -1,0 +1,6 @@
+# Generated
+*.gen.ts
+
+# Editor
+.vscode/*
+!.vscode/extensions.json

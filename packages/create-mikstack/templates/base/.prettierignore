@@ -1,0 +1,10 @@
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+bun.lock
+
+# Generated
+.svelte-kit
+build
+dist
+*.gen.ts

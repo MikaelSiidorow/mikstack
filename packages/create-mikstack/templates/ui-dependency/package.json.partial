@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@mikstack/ui": "^0.1.0"
+  }
+}

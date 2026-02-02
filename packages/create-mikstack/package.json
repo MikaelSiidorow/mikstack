@@ -1,0 +1,42 @@
+{
+  "name": "create-mikstack",
+  "version": "0.2.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikaelSiidorow/mikstack.git",
+    "directory": "packages/create-mikstack"
+  },
+  "bin": {
+    "create-mikstack": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "type": "module",
+  "scripts": {
+    "sync:ui": "bash scripts/sync-ui-vendor.sh",
+    "build": "bun run sync:ui && tsdown",
+    "dev": "tsdown --watch",
+    "check": "tsc --noEmit",
+    "lint": "oxlint --type-aware --type-check --ignore-pattern templates && oxfmt --check src tsdown.config.ts",
+    "format": "oxfmt src tsdown.config.ts"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.0",
+    "picocolors": "^1.1.1",
+    "sv": "0.12.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
+    "oxlint-tsgolint": "^0.11.4",
+    "tsdown": "^0.20.0",
+    "typescript": "^5.9.3"
+  }
+}

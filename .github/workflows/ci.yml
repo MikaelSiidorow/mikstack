@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changes.outputs.matrix }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed packages
+        id: changes
+        run: |
+          # Determine base commit
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE=${{ github.event.pull_request.base.sha }}
+          else
+            BASE=${{ github.event.before }}
+          fi
+
+          # Check if root-level files changed (triggers all packages)
+          root_changed=false
+          if ! git diff --quiet "$BASE" HEAD -- ':(exclude)packages' 2>/dev/null; then
+            root_changed=true
+          fi
+
+          changed=()
+          for dir in packages/*/; do
+            pkg=$(basename "$dir")
+            if [ "$root_changed" = true ] || ! git diff --quiet "$BASE" HEAD -- "$dir" 2>/dev/null; then
+              changed+=("$pkg")
+            fi
+          done
+
+          if [ ${#changed[@]} -eq 0 ]; then
+            echo "matrix=[]" >> "$GITHUB_OUTPUT"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            json=$(printf '%s\n' "${changed[@]}" | jq -R . | jq -cs .)
+            echo "matrix=$json" >> "$GITHUB_OUTPUT"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  check:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+
+      - name: Detect available scripts
+        id: scripts
+        working-directory: packages/${{ matrix.package }}
+        run: |
+          for script in lint check test build; do
+            if jq -e ".scripts.\"$script\"" package.json > /dev/null 2>&1; then
+              echo "has_$script=true" >> "$GITHUB_OUTPUT"
+            fi
+          done
+          # Check if Playwright is needed for tests
+          if jq -e '.devDependencies["playwright"] // .devDependencies["@playwright/test"] // .devDependencies["@vitest/browser-playwright"]' package.json > /dev/null 2>&1; then
+            echo "needs_playwright=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Lint
+        if: steps.scripts.outputs.has_lint == 'true'
+        working-directory: packages/${{ matrix.package }}
+        run: bun run lint
+
+      - name: Check
+        if: steps.scripts.outputs.has_check == 'true'
+        working-directory: packages/${{ matrix.package }}
+        run: bun run check
+
+      - name: Install Playwright
+        if: steps.scripts.outputs.has_test == 'true' && steps.scripts.outputs.needs_playwright == 'true'
+        run: bunx playwright install --with-deps chromium
+
+      - name: Test
+        if: steps.scripts.outputs.has_test == 'true'
+        working-directory: packages/${{ matrix.package }}
+        run: bun run test
+
+      - name: Build
+        if: steps.scripts.outputs.has_build == 'true'
+        working-directory: packages/${{ matrix.package }}
+        run: bun run build
+
+  changeset:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - name: Check for changeset
+        run: bunx changeset status --since=origin/main

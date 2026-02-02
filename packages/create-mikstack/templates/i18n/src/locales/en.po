@@ -1,0 +1,121 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: {{projectName}}\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language: en\n"
+"Language-Team: English, United States\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/routes/(app)/+page.svelte
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Check your email for a magic link to sign in."
+msgstr "Check your email for a magic link to sign in."
+
+#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/+page.svelte
+msgid "Content"
+msgstr "Content"
+
+#: src/routes/(app)/+page.svelte
+msgid "Create note"
+msgstr "Create note"
+
+#: src/routes/(app)/+page.svelte
+msgid "Creating..."
+msgstr "Creating..."
+
+#: src/routes/(app)/+page.svelte
+msgid "Delete"
+msgstr "Delete"
+
+#: src/routes/(app)/+page.svelte
+msgid "Edit"
+msgstr "Edit"
+
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Email"
+msgstr "Email"
+
+#: src/lib/server/emails/magic-link.ts
+msgid "If you didn't try to sign in, you can safely ignore this email."
+msgstr "If you didn't try to sign in, you can safely ignore this email."
+
+#: src/routes/(app)/+page.svelte
+msgid "New note"
+msgstr "New note"
+
+#: src/routes/(app)/+page.svelte
+msgid "No notes yet. Create one above!"
+msgstr "No notes yet. Create one above!"
+
+#: src/routes/(app)/+page.svelte
+msgid "Note title"
+msgstr "Note title"
+
+#: src/routes/(app)/+page.svelte
+msgid "Notes"
+msgstr "Notes"
+
+#: src/lib/server/emails/magic-link.ts
+msgid "Or, copy and paste this temporary login URL:"
+msgstr "Or, copy and paste this temporary login URL:"
+
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Please enter a valid email address"
+msgstr "Please enter a valid email address"
+
+#: src/routes/(app)/+page.svelte
+msgid "Save"
+msgstr "Save"
+
+#: src/routes/(app)/+page.svelte
+msgid "Saving..."
+msgstr "Saving..."
+
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Sending magic link..."
+msgstr "Sending magic link..."
+
+#: src/lib/server/emails/magic-link.ts
+msgid "Sign in"
+msgstr "Sign in"
+
+#: src/lib/server/emails/magic-link.ts
+#: src/lib/server/emails/magic-link.ts
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Sign in to {{projectName}}"
+msgstr "Sign in to {{projectName}}"
+
+#: src/routes/(public)/sign-in/+page.svelte
+msgid "Sign in with magic link"
+msgstr "Sign in with magic link"
+
+#: src/routes/(app)/+page.svelte
+msgid "Sign out"
+msgstr "Sign out"
+
+#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/+page.svelte
+msgid "Title"
+msgstr "Title"
+
+#: src/routes/(app)/+page.svelte
+msgid "Title is required"
+msgstr "Title is required"
+
+#: src/routes/(app)/+page.svelte
+msgid "Write something..."
+msgstr "Write something..."
+
+#: src/routes/(app)/+page.svelte
+msgid "Your notes"
+msgstr "Your notes"

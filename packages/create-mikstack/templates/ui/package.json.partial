@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "lint:css": "stylelint \"src/**/*.{css,svelte}\""
+  },
+  "dependencies": {
+    "phosphor-svelte": "^3.1.0",
+    "svelte-sonner": "^1.0.0"
+  },
+  "devDependencies": {
+    "stylelint": "^17.1.1",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-standard": "^40.0.0"
+  }
+}

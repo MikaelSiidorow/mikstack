@@ -1,0 +1,109 @@
+name: create-mikstack
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - packages/create-mikstack/**
+  pull_request:
+    branches: [main]
+    paths:
+      - packages/create-mikstack/**
+
+jobs:
+  scaffold-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pm: [npm, pnpm, bun]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v6
+
+      - run: git config --global user.name "CI" && git config --global user.email "ci@test"
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: pnpm/action-setup@v4
+        if: matrix.pm == 'pnpm'
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Install monorepo deps and build all @mikstack/* packages
+      - run: bun install
+
+      - run: bun run --filter '@mikstack/*' build
+
+      - run: bun run --filter create-mikstack build
+
+      # Scaffold a test project outside the monorepo to avoid workspace conflicts
+      - name: Scaffold with ${{ matrix.pm }}
+        run: node ${{ github.workspace }}/packages/create-mikstack/dist/index.mjs ${{ runner.temp }}/test-output --yes
+        env:
+          npm_config_user_agent: ${{ matrix.pm }}/1.0.0
+
+      # Pack @mikstack/* into tarballs and patch deps (avoids symlink type conflicts)
+      - name: Patch @mikstack/* deps
+        run: |
+          node -e "
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { execSync } from 'node:child_process';
+          const pkgsDir = path.join('${{ github.workspace }}', 'packages');
+          const patches = {};
+          for (const dir of fs.readdirSync(pkgsDir)) {
+            const p = path.join(pkgsDir, dir, 'package.json');
+            if (!fs.existsSync(p)) continue;
+            const pkg = JSON.parse(fs.readFileSync(p, 'utf-8'));
+            if (pkg.name && pkg.name.startsWith('@mikstack/')) {
+              const pkgDir = path.join(pkgsDir, dir);
+              const output = execSync('npm pack --pack-destination /tmp', { cwd: pkgDir, encoding: 'utf-8' });
+              const tarball = output.trim().split('\n').pop();
+              patches[pkg.name] = 'file:/tmp/' + tarball;
+            }
+          }
+          const targetPath = path.join('${{ runner.temp }}', 'test-output', 'package.json');
+          const targetPkg = JSON.parse(fs.readFileSync(targetPath, 'utf-8'));
+          for (const [name, ref] of Object.entries(patches)) {
+            if (targetPkg.dependencies?.[name]) targetPkg.dependencies[name] = ref;
+            if (targetPkg.devDependencies?.[name]) targetPkg.devDependencies[name] = ref;
+          }
+          fs.writeFileSync(targetPath, JSON.stringify(targetPkg, null, 2) + '\n');
+          console.log('Patched:', Object.keys(patches).join(', '));
+          "
+
+      - name: Install dependencies
+        run: rm -f bun.lock package-lock.json pnpm-lock.yaml && ${{ matrix.pm }} install
+        working-directory: ${{ runner.temp }}/test-output
+
+      - name: Format
+        run: ${{ matrix.pm }} run format
+        working-directory: ${{ runner.temp }}/test-output
+
+      # Verify scaffolded project
+      - run: ${{ matrix.pm }} run lint
+        working-directory: ${{ runner.temp }}/test-output
+
+      - run: ${{ matrix.pm }} run format:check
+        working-directory: ${{ runner.temp }}/test-output
+
+      - run: ${{ matrix.pm }} run check
+        working-directory: ${{ runner.temp }}/test-output
+
+      - run: ${{ matrix.pm }} run build
+        working-directory: ${{ runner.temp }}/test-output
+
+      - name: Extract i18n (if available)
+        run: ${{ matrix.pm }} run i18n:extract || true
+        working-directory: ${{ runner.temp }}/test-output
+
+      # Ensure no files were modified by checks (exclude package.json — modified by tarball patching)
+      - name: No git diff
+        run: git diff --exit-code -- ':!package.json' ':!package-lock.json' ':!bun.lock' ':!pnpm-lock.yaml'
+        working-directory: ${{ runner.temp }}/test-output

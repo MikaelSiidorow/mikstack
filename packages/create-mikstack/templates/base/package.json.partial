@@ -1,0 +1,52 @@
+{
+  "scripts": {
+    "prepare": "drizzle-zero generate --output src/lib/zero/zero-schema.gen.ts && (svelte-kit sync || echo '')",
+    "dev": "docker compose up -d --wait && concurrently --names app,zero \"vite dev\" \"zero-cache-dev\"",
+    "dev:app": "vite dev",
+    "dev:zero": "zero-cache-dev",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:start": "docker compose up -d --wait",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "docker compose up -d --wait && drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "{{seedRunner}} src/lib/server/db/seed.ts",
+    "zero:generate": "drizzle-zero generate --output src/lib/zero/zero-schema.gen.ts",
+    "zero:start": "zero-cache-dev"
+  },
+  "dependencies": {
+    "@mikstack/email": "^0.1.2",
+    "@mikstack/form": "^0.1.0",
+    "@mikstack/notifications": "^0.1.1",
+    "@rocicorp/zero": "^0.25.12",
+    "better-auth": "^1.4.18",
+    "drizzle-orm": "^0.45.1",
+    "nodemailer": "^8.0.1",
+    "postgres": "^3.4.8",
+    "valibot": "^1.2.0",
+    "zero-svelte": "^1.2.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "@eslint/compat": "^1.4.1",
+    "@eslint/js": "^9.39.2",
+    "@types/nodemailer": "^7.0.9",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-zero": "^0.17.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.14.0",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
+    "typescript-eslint": "^8.54.0",
+    "vite-plugin-devtools-json": "^0.2.1"
+  },
+  "trustedDependencies": [
+    "@rocicorp/zero-sqlite3"
+  ]
+}

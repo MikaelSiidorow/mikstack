@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "i18n:extract": "lingui extract",
+    "i18n:extract:watch": "lingui extract --watch"
+  },
+  "dependencies": {
+    "@lingui/core": "^5.9.0",
+    "@mikstack/svelte-lingui": "^0.1.4"
+  },
+  "devDependencies": {
+    "@lingui/cli": "^5.9.0",
+    "@lingui/conf": "^5.9.0"
+  }
+}

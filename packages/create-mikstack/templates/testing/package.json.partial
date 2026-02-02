@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "@testcontainers/postgresql": "^11.11.0"
+  }
+}

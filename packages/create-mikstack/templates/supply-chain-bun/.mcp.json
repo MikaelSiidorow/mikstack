@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "svelte": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["@sveltejs/mcp"]
+    },
+    "chrome-devtools": {
+      "command": "bunx",
+      "args": ["chrome-devtools-mcp@latest"]
+    }
+  }
+}
