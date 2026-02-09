@@ -12,6 +12,7 @@ Opinionated tooling for building full-stack SvelteKit applications.
 | [`@mikstack/form`](./packages/form) | Svelte 5 form validation using Standard Schema |
 | [`@mikstack/ui`](./packages/ui) | CSS-first Svelte 5 component library |
 | [`@mikstack/email`](./packages/email) | Zero-dependency email rendering |
+| [`@mikstack/storage`](./packages/storage) | S3-compatible file storage with Drizzle metadata tracking |
 
 ## Quick start
 

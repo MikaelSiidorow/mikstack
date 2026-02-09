@@ -101,6 +101,20 @@ export const notificationPreference = pgTable("notification_preference", {
   updatedAt: timestamp().notNull().defaultNow(),
 });
 
+// Storage tables (managed by @mikstack/storage)
+export const fileMetadata = pgTable("file_metadata", {
+  id: text()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  key: text().notNull(),
+  bucket: text().notNull(),
+  filename: text().notNull(),
+  mimeType: text().notNull(),
+  size: integer().notNull(),
+  uploadedBy: text().references(() => user.id, { onDelete: "set null" }),
+  createdAt: timestamp().notNull().defaultNow(),
+});
+
 // Application tables
 
 export const note = pgTable("note", {
@@ -112,4 +126,17 @@ export const note = pgTable("note", {
     .references(() => user.id, { onDelete: "cascade" }),
   createdAt: timestamp().notNull(),
   updatedAt: timestamp().notNull(),
+});
+
+export const noteAttachment = pgTable("note_attachment", {
+  id: text()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  noteId: text()
+    .notNull()
+    .references(() => note.id, { onDelete: "cascade" }),
+  fileId: text()
+    .notNull()
+    .references(() => fileMetadata.id, { onDelete: "cascade" }),
+  createdAt: timestamp().notNull().defaultNow(),
 });

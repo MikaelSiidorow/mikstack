@@ -22,6 +22,7 @@
     "@mikstack/email": "^0.1.2",
     "@mikstack/form": "^0.1.0",
     "@mikstack/notifications": "^0.1.1",
+    "@mikstack/storage": "^0.1.0",
     "@rocicorp/zero": "^0.25.12",
     "better-auth": "^1.4.18",
     "drizzle-orm": "^0.45.1",

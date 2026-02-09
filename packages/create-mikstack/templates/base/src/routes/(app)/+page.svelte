@@ -1,5 +1,6 @@
 <script lang="ts">
   import NotePencilIcon from "phosphor-svelte/lib/NotePencilIcon";
+  import PaperclipIcon from "phosphor-svelte/lib/PaperclipIcon";
   import PencilSimpleIcon from "phosphor-svelte/lib/PencilSimpleIcon";
   import PlusIcon from "phosphor-svelte/lib/PlusIcon";
   import SignOutIcon from "phosphor-svelte/lib/SignOutIcon";
@@ -107,6 +108,109 @@
     await authClient.signOut();
     await dropAllDatabases();
     window.location.href = resolve("/sign-in");
+  }
+
+  // ── Attachments ──
+
+  interface Attachment {
+    id: string;
+    fileId: string;
+    filename: string;
+    mimeType: string;
+    size: number;
+    url: string;
+    createdAt: string;
+  }
+
+  let attachmentsByNote = $state<Record<string, Attachment[]>>({});
+  let uploadingNote = $state<string | null>(null);
+  let expandedNote = $state<string | null>(null);
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  async function loadAttachments(noteId: string) {
+    const res = await fetch(resolve(`/api/notes/${noteId}/attachments`));
+    if (res.ok) {
+      const data = await res.json();
+      attachmentsByNote[noteId] = data.attachments;
+    }
+  }
+
+  function toggleAttachments(noteId: string) {
+    if (expandedNote === noteId) {
+      expandedNote = null;
+    } else {
+      expandedNote = noteId;
+      loadAttachments(noteId);
+    }
+  }
+
+  async function uploadFile(noteId: string, file: File) {
+    uploadingNote = noteId;
+    try {
+      // 1. Get presigned upload URL
+      const presignRes = await fetch(resolve(`/api/notes/${noteId}/attachments`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "presign",
+          filename: file.name,
+          mimeType: file.type || "application/octet-stream",
+        }),
+      });
+      if (!presignRes.ok) throw new Error("Failed to get upload URL");
+      const { url, key } = await presignRes.json();
+
+      // 2. Upload file directly to S3 via presigned URL
+      const uploadRes = await fetch(url, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+      });
+      if (!uploadRes.ok) throw new Error("Failed to upload file");
+
+      // 3. Confirm upload to create metadata + link to note
+      const confirmRes = await fetch(resolve(`/api/notes/${noteId}/attachments`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "confirm",
+          key,
+          filename: file.name,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+        }),
+      });
+      if (!confirmRes.ok) throw new Error("Failed to confirm upload");
+
+      // 4. Refresh attachment list
+      await loadAttachments(noteId);
+      expandedNote = noteId;
+    } finally {
+      uploadingNote = null;
+    }
+  }
+
+  function handleFileSelect(noteId: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      uploadFile(noteId, file);
+      input.value = "";
+    }
+  }
+
+  async function deleteAttachment(noteId: string, attachmentId: string) {
+    const res = await fetch(resolve(`/api/notes/${noteId}/attachments?id=${attachmentId}`), {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      await loadAttachments(noteId);
+    }
   }
 </script>
 
@@ -317,6 +421,35 @@
                   <PencilSimpleIcon size={16} /> Edit
                   <!-- {{/if:!i18n}} -->
                 </Button>
+                <label class="attach-btn">
+                  <input
+                    type="file"
+                    hidden
+                    onchange={(e) => handleFileSelect(note.id, e)}
+                    disabled={uploadingNote === note.id}
+                  />
+                  <Button variant="ghost" type="button" disabled={uploadingNote === note.id} onclick={(e: MouseEvent) => {
+                    const label = (e.currentTarget as HTMLElement).closest('label');
+                    label?.querySelector('input')?.click();
+                    e.preventDefault();
+                  }}>
+                    <PaperclipIcon size={16} />
+                    <!-- {{#if:i18n}} -->
+                    {uploadingNote === note.id ? t`Uploading...` : t`Attach`}
+                    <!-- {{/if:i18n}} -->
+                    <!-- {{#if:!i18n}} -->
+                    {uploadingNote === note.id ? "Uploading..." : "Attach"}
+                    <!-- {{/if:!i18n}} -->
+                  </Button>
+                </label>
+                <Button variant="ghost" onclick={() => toggleAttachments(note.id)}>
+                  <!-- {{#if:i18n}} -->
+                  {expandedNote === note.id ? t`Hide files` : t`Files`}
+                  <!-- {{/if:i18n}} -->
+                  <!-- {{#if:!i18n}} -->
+                  {expandedNote === note.id ? "Hide files" : "Files"}
+                  <!-- {{/if:!i18n}} -->
+                </Button>
                 <Button variant="danger" onclick={() => deleteNote(note.id)}>
                   <!-- {{#if:i18n}} -->
                   <TrashIcon size={16} /> {t`Delete`}
@@ -326,6 +459,36 @@
                   <!-- {{/if:!i18n}} -->
                 </Button>
               </div>
+              {#if expandedNote === note.id}
+                <div class="attachments">
+                  {#if !attachmentsByNote[note.id] || attachmentsByNote[note.id].length === 0}
+                    <!-- {{#if:i18n}} -->
+                    <p class="empty">{t`No attachments yet.`}</p>
+                    <!-- {{/if:i18n}} -->
+                    <!-- {{#if:!i18n}} -->
+                    <p class="empty">No attachments yet.</p>
+                    <!-- {{/if:!i18n}} -->
+                  {:else}
+                    <ul class="attachment-list">
+                      {#each attachmentsByNote[note.id] as attachment (attachment.id)}
+                        <li class="attachment-item">
+                          <a href={attachment.url} target="_blank" rel="noopener noreferrer" class="attachment-link">
+                            <PaperclipIcon size={14} />
+                            <span class="attachment-name">{attachment.filename}</span>
+                            <span class="attachment-size">{formatFileSize(attachment.size)}</span>
+                          </a>
+                          <button
+                            class="attachment-delete"
+                            onclick={() => deleteAttachment(note.id, attachment.id)}
+                          >
+                            <XIcon size={14} />
+                          </button>
+                        </li>
+                      {/each}
+                    </ul>
+                  {/if}
+                </div>
+              {/if}
             {/if}
           </li>
         {/each}
@@ -428,8 +591,77 @@
     gap: var(--space-2);
   }
 
+  .attach-btn {
+    display: contents;
+  }
+
   .empty {
     color: var(--text-2);
     font-size: var(--text-sm);
+  }
+
+  .attachments {
+    border-top: 1px solid var(--border);
+    padding-top: var(--space-3);
+  }
+
+  .attachment-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-1);
+    font-size: var(--text-sm);
+  }
+
+  .attachment-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: inherit;
+    text-decoration: none;
+    min-width: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .attachment-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .attachment-size {
+    color: var(--text-2);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .attachment-delete {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    color: var(--text-2);
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--danger);
+      background-color: var(--surface-2);
+    }
   }
 </style>
