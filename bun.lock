@@ -101,7 +101,7 @@
     },
     "packages/svelte-lingui": {
       "name": "@mikstack/svelte-lingui",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "dependencies": {
         "@lingui/message-utils": "^5.0.0 || ^6.0.0",
         "gettext-parser": "^8.0.0",
@@ -355,7 +355,7 @@
 
     "@lingui/core": ["@lingui/core@6.0.0", "", { "dependencies": { "@lingui/babel-plugin-lingui-macro": "6.0.0", "@lingui/message-utils": "6.0.0" }, "peerDependencies": { "babel-plugin-macros": "2 || 3" }, "optionalPeers": ["babel-plugin-macros"] }, "sha512-2UcneQQhGAD0TLk5UmWspqrfULteqN0yxlDHAt/QNySXtXmfh+QoHHAOSVphbNOFBV2/w62XVROk10hRaQSmbg=="],
 
-    "@lingui/message-utils": ["@lingui/message-utils@5.9.0", "", { "dependencies": { "@messageformat/parser": "^5.0.0", "js-sha256": "^0.10.1" } }, "sha512-BL5MZt7yCLuyEbuIm+w0TZIZ/ctQOX5IO3yVOrWpM8L3rh2uP/MPDUKhGy8e/XPNMgBVFhlpos/tSzvdh03ErQ=="],
+    "@lingui/message-utils": ["@lingui/message-utils@6.0.0", "", { "dependencies": { "@messageformat/date-skeleton": "^1.1.0", "@messageformat/parser": "^5.0.0", "js-sha256": "^0.10.1" } }, "sha512-7HhrNjY9tQFa4l2RuwfqK7C5PViZnUpWl6RnBjvYz4YOWjP/jJwwbbG2oOVJeAfeo93BAyiO91lPoZnlBPjDEw=="],
 
     "@loaderkit/resolve": ["@loaderkit/resolve@1.0.4", "", { "dependencies": { "@braidai/lang": "^1.0.0" } }, "sha512-rJzYKVcV4dxJv+vW6jlvagF8zvGxHJ2+HTr1e2qOejfmGhAApgJHl8Aog4mMszxceTRiKTTbnpgmTO1bEZHV/A=="],
 
@@ -1261,11 +1261,7 @@
 
     "@lingui/babel-plugin-lingui-macro/@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
-    "@lingui/babel-plugin-lingui-macro/@lingui/message-utils": ["@lingui/message-utils@6.0.0", "", { "dependencies": { "@messageformat/date-skeleton": "^1.1.0", "@messageformat/parser": "^5.0.0", "js-sha256": "^0.10.1" } }, "sha512-7HhrNjY9tQFa4l2RuwfqK7C5PViZnUpWl6RnBjvYz4YOWjP/jJwwbbG2oOVJeAfeo93BAyiO91lPoZnlBPjDEw=="],
-
     "@lingui/conf/lilconfig": ["lilconfig@3.1.3", "", {}, "sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw=="],
-
-    "@lingui/core/@lingui/message-utils": ["@lingui/message-utils@6.0.0", "", { "dependencies": { "@messageformat/date-skeleton": "^1.1.0", "@messageformat/parser": "^5.0.0", "js-sha256": "^0.10.1" } }, "sha512-7HhrNjY9tQFa4l2RuwfqK7C5PViZnUpWl6RnBjvYz4YOWjP/jJwwbbG2oOVJeAfeo93BAyiO91lPoZnlBPjDEw=="],
 
     "@manypkg/find-root/@types/node": ["@types/node@12.20.55", "", {}, "sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ=="],
 
