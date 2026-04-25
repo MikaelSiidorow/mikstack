@@ -18,8 +18,8 @@ export const GET: RequestHandler = async ({ params }) => {
   const content = delivery.content as { html?: string; subject?: string };
   if (!content.html) error(404, "No HTML content for this delivery");
 
-  const escaped = content.html.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
-  const title = content.subject ? `<title>${content.subject}</title>` : "";
+  const escaped = escapeHtml(content.html);
+  const title = content.subject ? `<title>${escapeHtml(content.subject)}</title>` : "";
 
   const wrapper = `<!DOCTYPE html>
 <html>
@@ -31,3 +31,12 @@ export const GET: RequestHandler = async ({ params }) => {
     headers: { "content-type": "text/html; charset=utf-8" },
   });
 };
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("'", "&#39;");
+}
