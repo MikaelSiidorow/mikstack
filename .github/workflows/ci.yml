@@ -74,7 +74,7 @@ jobs:
             fi
           done
           # Check if Playwright is needed for tests
-          if jq -e '.devDependencies["playwright"] // .devDependencies["@playwright/test"] // .devDependencies["@vitest/browser-playwright"]' package.json > /dev/null 2>&1; then
+          if jq -e '(.dependencies // {}) + (.devDependencies // {}) | .["playwright"] // .["@playwright/test"] // .["@vitest/browser-playwright"]' package.json > /dev/null 2>&1; then
             echo "needs_playwright=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -90,7 +90,8 @@ jobs:
 
       - name: Install Playwright
         if: steps.scripts.outputs.has_test == 'true' && steps.scripts.outputs.needs_playwright == 'true'
-        run: bunx playwright install --with-deps chromium
+        working-directory: packages/${{ matrix.package }}
+        run: bun run playwright install --with-deps chromium
 
       - name: Test
         if: steps.scripts.outputs.has_test == 'true'
