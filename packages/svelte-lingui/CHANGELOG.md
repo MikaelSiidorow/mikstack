@@ -1,5 +1,11 @@
 # @mikstack/svelte-lingui
 
+## 0.4.0
+
+### Minor Changes
+
+- Support Lingui 6: widen `@lingui/message-utils` dependency range to `^5.0.0 || ^6.0.0`. Lingui 6 keeps the `generateMessageId` and `compileMessage` APIs we depend on, so no source changes were required. Tested against `@lingui/core@6.0.0`. ([#5](https://github.com/MikaelSiidorow/mikstack/pull/5))
+
 ## 0.3.0
 
 ### Minor Changes
