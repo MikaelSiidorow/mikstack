@@ -1,7 +1,8 @@
+import { defineConfig } from "@lingui/cli";
+import { formatter } from "@lingui/format-po";
 import { extractor } from "@mikstack/svelte-lingui/extractor";
-import type { LinguiConfig } from "@lingui/conf";
 
-const config: LinguiConfig = {
+export default defineConfig({
   locales: ["en", "fi"],
   sourceLocale: "en",
   catalogs: [
@@ -11,10 +12,5 @@ const config: LinguiConfig = {
     },
   ],
   extractors: [extractor],
-  format: "po",
-  formatOptions: {
-    lineNumbers: false,
-  },
-};
-
-export default config;
+  format: formatter({ lineNumbers: false }),
+});

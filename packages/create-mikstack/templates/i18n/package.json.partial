@@ -4,11 +4,12 @@
     "i18n:extract:watch": "lingui extract --watch"
   },
   "dependencies": {
-    "@lingui/core": "^5.9.0",
-    "@mikstack/svelte-lingui": "^0.1.4"
+    "@lingui/core": "^6.0.0",
+    "@mikstack/svelte-lingui": "^0.4.0"
   },
   "devDependencies": {
-    "@lingui/cli": "^5.9.0",
-    "@lingui/conf": "^5.9.0"
+    "@lingui/cli": "^6.0.0",
+    "@lingui/conf": "^6.0.0",
+    "@lingui/format-po": "^6.0.0"
   }
 }

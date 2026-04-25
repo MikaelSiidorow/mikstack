@@ -44,11 +44,12 @@ export function scaffold(config: MikstackConfig, onStatus?: (msg: string) => voi
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
   onStatus?.("Applying templates...");
+  const context = buildContext(config);
 
   // 2. Apply overlays (each copies files then merges any package.json.partial)
   const overlay = (dir: string) => {
     copyDir(dir, target);
-    mergePartials(target);
+    mergePartials(target, context);
   };
 
   overlay(path.join(TEMPLATES_DIR, "base"));
@@ -78,7 +79,6 @@ export function scaffold(config: MikstackConfig, onStatus?: (msg: string) => voi
 
   // 7. Render template markers
   onStatus?.("Rendering configuration...");
-  const context = buildContext(config);
   renderDir(target, context);
 
   // 8. Append .gitignore additions from overlays
@@ -124,7 +124,7 @@ function copyDir(src: string, dest: string): void {
   }
 }
 
-function mergePartials(dir: string): void {
+function mergePartials(dir: string, context: TemplateContext): void {
   const pkgPath = path.join(dir, "package.json");
   if (!fs.existsSync(pkgPath)) return;
 
@@ -132,7 +132,8 @@ function mergePartials(dir: string): void {
   const partials = findFiles(dir, "package.json.partial");
 
   for (const partialPath of partials) {
-    const partial = JSON.parse(fs.readFileSync(partialPath, "utf-8"));
+    const partialContent = renderTemplate(fs.readFileSync(partialPath, "utf-8"), context);
+    const partial = JSON.parse(partialContent);
     deepMerge(pkg, partial);
     fs.unlinkSync(partialPath);
   }
