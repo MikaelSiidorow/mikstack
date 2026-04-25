@@ -2,7 +2,10 @@ import { notif } from "$lib/server/notifications";
 import type { RequestHandler } from "./$types";
 
 const handle: RequestHandler = async ({ request, locals }) => {
-  return notif.handler(request, locals.user?.id ?? null);
+  if (!locals.user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return notif.handler(request, locals.user.id);
 };
 
 export const GET = handle;

@@ -3,7 +3,12 @@ import * as schema from "./src/lib/server/db/schema";
 
 export default drizzleZeroConfig(schema, {
   tables: {
-    user: true,
+    user: {
+      id: true,
+      name: true,
+      image: true,
+      // Exclude email, emailVerified, createdAt, updatedAt from client sync
+    },
     note: true,
     inAppNotification: true,
     // Exclude auth-internal and server-only tables from client sync

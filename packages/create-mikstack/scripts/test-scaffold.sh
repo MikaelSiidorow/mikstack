@@ -20,14 +20,14 @@ echo "==> Cleaning $OUTPUT..."
 rm -rf "$OUTPUT"
 
 echo "==> Scaffolding with $PM..."
-npm_config_user_agent="$PM/1.0.0" node "$MONOREPO/packages/create-mikstack/dist/index.js" "$OUTPUT" --yes
+npm_config_user_agent="$PM/1.0.0" bun "$MONOREPO/packages/create-mikstack/dist/index.mjs" "$OUTPUT" --yes
 
 TARBALLS_DIR="/tmp/mikstack-tarballs"
 rm -rf "$TARBALLS_DIR"
 mkdir -p "$TARBALLS_DIR"
 
 echo "==> Packing @mikstack/* packages and patching deps..."
-node -e "
+bun -e "
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
@@ -79,7 +79,7 @@ echo "==> Running i18n:extract (if available)..."
 (cd "$OUTPUT" && "$PM" run i18n:extract 2>/dev/null) || true
 
 echo "==> Checking for unexpected diffs..."
-(cd "$OUTPUT" && git diff --exit-code -- ':!package.json')
+(cd "$OUTPUT" && git diff --exit-code -- ':!package.json' ':!package-lock.json' ':!bun.lock' ':!pnpm-lock.yaml')
 
 echo ""
 echo "All checks passed for $PM scaffold at $OUTPUT"

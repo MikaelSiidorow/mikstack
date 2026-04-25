@@ -37,10 +37,12 @@ RUN bun install --production
 # {{/if:pmIsBun}}
 
 FROM base
+RUN addgroup --system --gid 1001 app && adduser --system --uid 1001 --ingroup app app
 WORKDIR /app
-COPY --from=build /app/build ./build
-COPY --from=build /app/node_modules ./node_modules
-COPY package.json .
+COPY --from=build --chown=app:app /app/build ./build
+COPY --from=build --chown=app:app /app/node_modules ./node_modules
+COPY --chown=app:app package.json .
 ENV NODE_ENV=production
+USER app
 EXPOSE 3000
 CMD ["node", "build"]

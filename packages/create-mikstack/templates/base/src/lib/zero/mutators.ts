@@ -5,7 +5,11 @@ import { zql } from "./schema";
 export const mutators = defineMutators({
   note: {
     create: defineMutator(
-      v.object({ id: v.string(), title: v.pipe(v.string(), v.minLength(1)), content: v.string() }),
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        title: v.pipe(v.string(), v.minLength(1)),
+        content: v.string(),
+      }),
       async ({ tx, ctx, args }) => {
         const now = Date.now();
         await tx.mutate.note.insert({
@@ -19,11 +23,13 @@ export const mutators = defineMutators({
       },
     ),
     update: defineMutator(
-      v.object({ id: v.string(), title: v.pipe(v.string(), v.minLength(1)), content: v.string() }),
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        title: v.pipe(v.string(), v.minLength(1)),
+        content: v.string(),
+      }),
       async ({ tx, ctx, args }) => {
-        const note = await tx.run(
-          zql.note.where("id", args.id).where("userId", ctx.userID).one(),
-        );
+        const note = await tx.run(zql.note.where("id", args.id).where("userId", ctx.userID).one());
         if (!note) throw new Error("Note not found");
         await tx.mutate.note.update({
           id: args.id,
@@ -33,12 +39,13 @@ export const mutators = defineMutators({
         });
       },
     ),
-    delete: defineMutator(v.object({ id: v.string() }), async ({ tx, ctx, args }) => {
-      const note = await tx.run(
-        zql.note.where("id", args.id).where("userId", ctx.userID).one(),
-      );
-      if (!note) throw new Error("Note not found");
-      await tx.mutate.note.delete({ id: args.id });
-    }),
+    delete: defineMutator(
+      v.object({ id: v.pipe(v.string(), v.uuid()) }),
+      async ({ tx, ctx, args }) => {
+        const note = await tx.run(zql.note.where("id", args.id).where("userId", ctx.userID).one());
+        if (!note) throw new Error("Note not found");
+        await tx.mutate.note.delete({ id: args.id });
+      },
+    ),
   },
 });
