@@ -21,8 +21,6 @@ jobs:
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
-      - name: Install npm 11 (required for OIDC provenance)
-        run: npm install -g npm@^11
       - run: bun install
       - name: Build all packages
         run: bun run --filter '*' build
