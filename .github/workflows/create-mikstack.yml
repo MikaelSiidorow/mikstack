@@ -90,6 +90,9 @@ jobs:
       - run: ${{ matrix.pm }} run lint
         working-directory: ${{ runner.temp }}/test-output
 
+      - run: ${{ matrix.pm }} run lint:css
+        working-directory: ${{ runner.temp }}/test-output
+
       - run: ${{ matrix.pm }} run format:check
         working-directory: ${{ runner.temp }}/test-output
 
@@ -107,3 +110,107 @@ jobs:
       - name: No git diff
         run: git diff --exit-code -- ':!package.json' ':!package-lock.json' ':!bun.lock' ':!pnpm-lock.yaml'
         working-directory: ${{ runner.temp }}/test-output
+
+      - name: Scaffold vendor UI project
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: |
+          bun -e "
+          import { scaffold } from './packages/create-mikstack/src/scaffold.ts';
+          scaffold({
+            projectName: 'test-output-vendor',
+            targetDir: '${{ runner.temp }}/test-output-vendor',
+            packageManager: 'bun',
+            mode: 'customize',
+            uiMode: 'vendor',
+            i18n: true,
+            testing: true,
+            githubActions: false,
+            adapter: 'node',
+          });
+          "
+
+      - name: Patch @mikstack/* deps (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: |
+          node -e "
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import { execSync } from 'node:child_process';
+          const pkgsDir = path.join('${{ github.workspace }}', 'packages');
+          const patches = {};
+          for (const dir of fs.readdirSync(pkgsDir)) {
+            const p = path.join(pkgsDir, dir, 'package.json');
+            if (!fs.existsSync(p)) continue;
+            const pkg = JSON.parse(fs.readFileSync(p, 'utf-8'));
+            if (pkg.name && pkg.name.startsWith('@mikstack/')) {
+              const pkgDir = path.join(pkgsDir, dir);
+              const output = execSync('npm pack --pack-destination /tmp', { cwd: pkgDir, encoding: 'utf-8' });
+              const tarball = output.trim().split('\n').pop();
+              patches[pkg.name] = 'file:/tmp/' + tarball;
+            }
+          }
+          const targetPath = path.join('${{ runner.temp }}', 'test-output-vendor', 'package.json');
+          const targetPkg = JSON.parse(fs.readFileSync(targetPath, 'utf-8'));
+          for (const [name, ref] of Object.entries(patches)) {
+            if (targetPkg.dependencies?.[name]) targetPkg.dependencies[name] = ref;
+            if (targetPkg.devDependencies?.[name]) targetPkg.devDependencies[name] = ref;
+          }
+          fs.writeFileSync(targetPath, JSON.stringify(targetPkg, null, 2) + '\n');
+          console.log('Patched:', Object.keys(patches).join(', '));
+          "
+
+      - name: Install dependencies (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: rm -f bun.lock package-lock.json pnpm-lock.yaml && bun install
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Format (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run format
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Lint (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run lint
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Lint CSS (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run lint:css
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Format check (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run format:check
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Check (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run check
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Build (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: bun run build
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: Smoke sign-in (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: |
+          bun run dev:app -- --host 127.0.0.1 --port 4173 >/tmp/test-output-vendor-dev.log 2>&1 &
+          pid=$!
+          trap 'kill $pid' EXIT
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4173/sign-in >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/test-output-vendor-dev.log
+          exit 1
+        working-directory: ${{ runner.temp }}/test-output-vendor
+
+      - name: No git diff (vendor)
+        if: matrix.pm == 'bun' && matrix.node == 24
+        run: git diff --exit-code -- ':!package.json' ':!package-lock.json' ':!bun.lock' ':!pnpm-lock.yaml'
+        working-directory: ${{ runner.temp }}/test-output-vendor
