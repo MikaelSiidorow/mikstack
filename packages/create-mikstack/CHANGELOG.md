@@ -1,5 +1,11 @@
 # create-mikstack
 
+## 0.3.1
+
+### Patch Changes
+
+- Harden generated app scaffolds by limiting synced user fields, requiring authenticated notification API access, escaping dev email previews, validating note mutation UUIDs, and running the Node adapter image as a non-root user. ([#3](https://github.com/MikaelSiidorow/mikstack/pull/3))
+
 ## 0.3.0
 
 ### Minor Changes
