@@ -18,7 +18,7 @@
     "lint": "bun run --filter '*' lint",
     "test": "bun run --filter '*' test",
     "changeset": "changeset",
-    "changeset:version": "changeset version",
+    "changeset:version": "changeset version && bun install --lockfile-only",
     "changeset:publish": "changeset publish"
   },
   "devDependencies": {
