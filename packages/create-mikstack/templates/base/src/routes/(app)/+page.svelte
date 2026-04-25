@@ -128,10 +128,12 @@
       <span class="email">{data.user.email}</span>
       <Button variant="ghost" onclick={signOut}>
         <!-- {{#if:i18n}} -->
-        <SignOutIcon size={16} weight="bold" /> {t`Sign out`}
+        <SignOutIcon size={16} weight="bold" />
+        {t`Sign out`}
         <!-- {{/if:i18n}} -->
         <!-- {{#if:!i18n}} -->
-        <SignOutIcon size={16} weight="bold" /> Sign out
+        <SignOutIcon size={16} weight="bold" />
+        Sign out
         <!-- {{/if:!i18n}} -->
       </Button>
     </div>
@@ -147,7 +149,12 @@
     <h2>New note</h2>
     <!-- {{/if:!i18n}} -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <form id={createNoteForm.id} onsubmit={createNoteForm.onsubmit} onkeydown={submitOnModEnter} class="note-form">
+    <form
+      id={createNoteForm.id}
+      onsubmit={createNoteForm.onsubmit}
+      onkeydown={submitOnModEnter}
+      class="note-form"
+    >
       <FormField for={createNoteForm.fields.title.as("text").id}>
         {#snippet label(attrs)}
           <!-- {{#if:i18n}} -->
@@ -240,7 +247,12 @@
           <li class="note-card">
             {#if editingId === note.id}
               <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-              <form id={editForm.id} onsubmit={editForm.onsubmit} onkeydown={submitOnModEnter} class="note-form">
+              <form
+                id={editForm.id}
+                onsubmit={editForm.onsubmit}
+                onkeydown={submitOnModEnter}
+                class="note-form"
+              >
                 <FormField for={editForm.fields.title.as("text").id}>
                   {#snippet label(attrs)}
                     <!-- {{#if:i18n}} -->
@@ -293,10 +305,12 @@
                   </Button>
                   <Button variant="ghost" type="button" onclick={cancelEdit}>
                     <!-- {{#if:i18n}} -->
-                    <XIcon size={16} weight="bold" /> {t`Cancel`}
+                    <XIcon size={16} weight="bold" />
+                    {t`Cancel`}
                     <!-- {{/if:i18n}} -->
                     <!-- {{#if:!i18n}} -->
-                    <XIcon size={16} weight="bold" /> Cancel
+                    <XIcon size={16} weight="bold" />
+                    Cancel
                     <!-- {{/if:!i18n}} -->
                   </Button>
                 </div>
@@ -311,18 +325,22 @@
               <div class="actions">
                 <Button variant="ghost" onclick={() => startEdit(note)}>
                   <!-- {{#if:i18n}} -->
-                  <PencilSimpleIcon size={16} /> {t`Edit`}
+                  <PencilSimpleIcon size={16} />
+                  {t`Edit`}
                   <!-- {{/if:i18n}} -->
                   <!-- {{#if:!i18n}} -->
-                  <PencilSimpleIcon size={16} /> Edit
+                  <PencilSimpleIcon size={16} />
+                  Edit
                   <!-- {{/if:!i18n}} -->
                 </Button>
                 <Button variant="danger" onclick={() => deleteNote(note.id)}>
                   <!-- {{#if:i18n}} -->
-                  <TrashIcon size={16} /> {t`Delete`}
+                  <TrashIcon size={16} />
+                  {t`Delete`}
                   <!-- {{/if:i18n}} -->
                   <!-- {{#if:!i18n}} -->
-                  <TrashIcon size={16} /> Delete
+                  <TrashIcon size={16} />
+                  Delete
                   <!-- {{/if:!i18n}} -->
                 </Button>
               </div>

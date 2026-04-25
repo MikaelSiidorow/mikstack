@@ -35,9 +35,7 @@ await z.mutate(mutators.myMutation(args));
 Mutators verify ownership before update/delete by including `userId` in the query:
 
 ```typescript
-const entity = await tx.run(
-  zql.note.where("id", args.id).where("userId", ctx.userID).one(),
-);
+const entity = await tx.run(zql.note.where("id", args.id).where("userId", ctx.userID).one());
 if (!entity) return;
 ```
 

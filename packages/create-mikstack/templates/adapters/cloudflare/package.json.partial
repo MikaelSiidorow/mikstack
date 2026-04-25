@@ -1,5 +1,5 @@
 {
   "devDependencies": {
-    "@sveltejs/adapter-cloudflare": "^7.2.6"
+    "@sveltejs/adapter-cloudflare": "^7.2.8"
   }
 }

@@ -21,7 +21,6 @@ msgid "Check your email for a magic link to sign in."
 msgstr "Check your email for a magic link to sign in."
 
 #: src/routes/(app)/+page.svelte
-#: src/routes/(app)/+page.svelte
 msgid "Content"
 msgstr "Content"
 
@@ -90,7 +89,6 @@ msgid "Sign in"
 msgstr "Sign in"
 
 #: src/lib/server/emails/magic-link.ts
-#: src/lib/server/emails/magic-link.ts
 #: src/routes/(public)/sign-in/+page.svelte
 msgid "Sign in to {{projectName}}"
 msgstr "Sign in to {{projectName}}"
@@ -103,7 +101,6 @@ msgstr "Sign in with magic link"
 msgid "Sign out"
 msgstr "Sign out"
 
-#: src/routes/(app)/+page.svelte
 #: src/routes/(app)/+page.svelte
 msgid "Title"
 msgstr "Title"
