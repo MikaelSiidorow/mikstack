@@ -145,7 +145,7 @@
       expandedNote = null;
     } else {
       expandedNote = noteId;
-      loadAttachments(noteId);
+      void loadAttachments(noteId);
     }
   }
 
@@ -199,7 +199,7 @@
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) {
-      uploadFile(noteId, file);
+      void uploadFile(noteId, file);
       input.value = "";
     }
   }
@@ -232,7 +232,8 @@
       <span class="email">{data.user.email}</span>
       <Button variant="ghost" onclick={signOut}>
         <!-- {{#if:i18n}} -->
-        <SignOutIcon size={16} weight="bold" /> {t`Sign out`}
+        <SignOutIcon size={16} weight="bold" />
+        {t`Sign out`}
         <!-- {{/if:i18n}} -->
         <!-- {{#if:!i18n}} -->
         <SignOutIcon size={16} weight="bold" /> Sign out
@@ -251,7 +252,12 @@
     <h2>New note</h2>
     <!-- {{/if:!i18n}} -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <form id={createNoteForm.id} onsubmit={createNoteForm.onsubmit} onkeydown={submitOnModEnter} class="note-form">
+    <form
+      id={createNoteForm.id}
+      onsubmit={createNoteForm.onsubmit}
+      onkeydown={submitOnModEnter}
+      class="note-form"
+    >
       <FormField for={createNoteForm.fields.title.as("text").id}>
         {#snippet label(attrs)}
           <!-- {{#if:i18n}} -->
@@ -344,7 +350,12 @@
           <li class="note-card">
             {#if editingId === note.id}
               <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-              <form id={editForm.id} onsubmit={editForm.onsubmit} onkeydown={submitOnModEnter} class="note-form">
+              <form
+                id={editForm.id}
+                onsubmit={editForm.onsubmit}
+                onkeydown={submitOnModEnter}
+                class="note-form"
+              >
                 <FormField for={editForm.fields.title.as("text").id}>
                   {#snippet label(attrs)}
                     <!-- {{#if:i18n}} -->
@@ -397,7 +408,8 @@
                   </Button>
                   <Button variant="ghost" type="button" onclick={cancelEdit}>
                     <!-- {{#if:i18n}} -->
-                    <XIcon size={16} weight="bold" /> {t`Cancel`}
+                    <XIcon size={16} weight="bold" />
+                    {t`Cancel`}
                     <!-- {{/if:i18n}} -->
                     <!-- {{#if:!i18n}} -->
                     <XIcon size={16} weight="bold" /> Cancel
@@ -415,7 +427,8 @@
               <div class="actions">
                 <Button variant="ghost" onclick={() => startEdit(note)}>
                   <!-- {{#if:i18n}} -->
-                  <PencilSimpleIcon size={16} /> {t`Edit`}
+                  <PencilSimpleIcon size={16} />
+                  {t`Edit`}
                   <!-- {{/if:i18n}} -->
                   <!-- {{#if:!i18n}} -->
                   <PencilSimpleIcon size={16} /> Edit
@@ -428,11 +441,16 @@
                     onchange={(e) => handleFileSelect(note.id, e)}
                     disabled={uploadingNote === note.id}
                   />
-                  <Button variant="ghost" type="button" disabled={uploadingNote === note.id} onclick={(e: MouseEvent) => {
-                    const label = (e.currentTarget as HTMLElement).closest('label');
-                    label?.querySelector('input')?.click();
-                    e.preventDefault();
-                  }}>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    disabled={uploadingNote === note.id}
+                    onclick={(e: MouseEvent) => {
+                      const label = (e.currentTarget as HTMLElement).closest("label");
+                      label?.querySelector("input")?.click();
+                      e.preventDefault();
+                    }}
+                  >
                     <PaperclipIcon size={16} />
                     <!-- {{#if:i18n}} -->
                     {uploadingNote === note.id ? t`Uploading...` : t`Attach`}
@@ -452,7 +470,8 @@
                 </Button>
                 <Button variant="danger" onclick={() => deleteNote(note.id)}>
                   <!-- {{#if:i18n}} -->
-                  <TrashIcon size={16} /> {t`Delete`}
+                  <TrashIcon size={16} />
+                  {t`Delete`}
                   <!-- {{/if:i18n}} -->
                   <!-- {{#if:!i18n}} -->
                   <TrashIcon size={16} /> Delete
@@ -461,7 +480,7 @@
               </div>
               {#if expandedNote === note.id}
                 <div class="attachments">
-                  {#if !attachmentsByNote[note.id] || attachmentsByNote[note.id].length === 0}
+                  {#if (attachmentsByNote[note.id]?.length ?? 0) === 0}
                     <!-- {{#if:i18n}} -->
                     <p class="empty">{t`No attachments yet.`}</p>
                     <!-- {{/if:i18n}} -->
@@ -470,13 +489,20 @@
                     <!-- {{/if:!i18n}} -->
                   {:else}
                     <ul class="attachment-list">
-                      {#each attachmentsByNote[note.id] as attachment (attachment.id)}
+                      {#each attachmentsByNote[note.id] ?? [] as attachment (attachment.id)}
                         <li class="attachment-item">
-                          <a href={attachment.url} target="_blank" rel="noopener noreferrer" class="attachment-link">
+                          <!-- eslint-disable svelte/no-navigation-without-resolve -->
+                          <a
+                            href={attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="attachment-link"
+                          >
                             <PaperclipIcon size={14} />
                             <span class="attachment-name">{attachment.filename}</span>
                             <span class="attachment-size">{formatFileSize(attachment.size)}</span>
                           </a>
+                          <!-- eslint-enable svelte/no-navigation-without-resolve -->
                           <button
                             class="attachment-delete"
                             onclick={() => deleteAttachment(note.id, attachment.id)}
