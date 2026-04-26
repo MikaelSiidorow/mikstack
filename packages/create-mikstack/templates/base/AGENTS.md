@@ -111,8 +111,12 @@ Test utils: `src/lib/server/db/test-utils.ts` — `createTestDatabase()` spins u
 import { createTestDatabase, stopTestDatabase, type TestDatabase } from "$lib/server/db/test-utils";
 
 let testDb: TestDatabase;
-beforeAll(async () => { testDb = await createTestDatabase(); });
-afterAll(async () => { await stopTestDatabase(testDb); });
+beforeAll(async () => {
+  testDb = await createTestDatabase();
+});
+afterAll(async () => {
+  await stopTestDatabase(testDb);
+});
 ```
 
 <!-- {{/if:testing}} -->

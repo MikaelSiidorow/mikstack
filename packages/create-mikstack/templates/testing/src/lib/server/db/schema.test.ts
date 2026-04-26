@@ -15,7 +15,10 @@ describe("database schema", () => {
   });
 
   it("pushes schema without data loss", async () => {
-    const result = await pushSchema(schema, testDb.db as unknown as Parameters<typeof pushSchema>[1]);
+    const result = await pushSchema(
+      schema,
+      testDb.db as unknown as Parameters<typeof pushSchema>[1],
+    );
     expect(result.warnings).toEqual([]);
     expect(result.hasDataLoss).toBe(false);
     await result.apply();
