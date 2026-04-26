@@ -1,5 +1,15 @@
 # create-mikstack
 
+## 0.3.3
+
+### Patch Changes
+
+- Fix follow-up issues in vendor-mode scaffolds: ([#9](https://github.com/MikaelSiidorow/mikstack/pull/9))
+  - update the `Switch` component to use `clip-path` instead of deprecated `clip`
+  - disable SSR in the generated app template root layout
+  - initialize Lingui context before route rendering while keeping locale changes reactive
+  - extend `create-mikstack` CI to run `lint:css` and exercise a vendor-mode `/sign-in` smoke check
+
 ## 0.3.2
 
 ### Patch Changes
